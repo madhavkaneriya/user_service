@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: user-service-backend
+    ports:
+      - '3000:3000'
+    networks:
+      - user-service-network
+    depends_on:
+      - mongodb
+    env_file:
+      - ./backend/.env
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - user-service-network
+
+# Define the network
+networks:
+  user-service-network:
+    driver: bridge
+
+# Define the volume for MongoDB data persistence
+volumes:
+  mongodb-data:
