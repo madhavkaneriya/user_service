@@ -19,7 +19,7 @@ export class MigrationService implements OnModuleInit {
     private async runMigration() {
         console.log('MigrationService: runMigration called');
         // initialize the mongodb database, table if doesn't exist
-        const db = this.connection.useDb('user_service');
+        const db = this.connection.useDb(process.env.DB_NAME);
 
         const collectionFound = await this.collectionExists(db);
         if (!collectionFound) {
