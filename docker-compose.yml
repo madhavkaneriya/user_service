@@ -26,6 +26,16 @@ services:
     networks:
       - user-service-network
 
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: user-service-frontend
+    ports:
+      - '8080:80' # This will expose the React app on port 8080
+    networks:
+      - user-service-network
+
 # Define the network
 networks:
   user-service-network:

@@ -1,6 +1,8 @@
 # Ignore node_modules and dist folders
 /backend/node_modules/
+/frontend/node_modules/
 /backend/dist/
+/frontend/dist/
 
 # Other common ignores
 .env
