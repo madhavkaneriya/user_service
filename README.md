@@ -21,10 +21,53 @@ Before you begin, ensure you have the following installed on your machine:
 
 ## Installation
 
-1. **Clone the repository:**
+**Clone the repository:**
 
 ```bash
 git clone https://github.com/your-username/user_service.git
 cd user_service
+```
+
+## Building Docker Images
+
+```bash
+docker-compose build
+```
+
+## Running the Application
+
+```bash
+docker-compose up
+```
+
+## Accessing the Application
+
+- Frontend (React app): http://localhost:8080
+- Backend (NestJS API): http://localhost:3000
+
+## Stopping the Application
+
+```bash
+docker-compose down
+```
+
+## Folder Structure
+
+```bash
+user_service/
+├── backend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── src/
+│   └── ...
+├── frontend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── public/
+│   ├── src/
+│   └── ...
+├── docker-compose.yml
+└── README.md
+```
 
 

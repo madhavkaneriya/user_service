@@ -21,3 +21,14 @@ Run the following command to install all the necessary dependencies:
 
 ```bash
 npm install
+```
+
+### Development
+To start the development server with hot reloading, run:
+
+```bash
+npm start
+```
+This will start the development server on http://localhost:8080.
+
+
