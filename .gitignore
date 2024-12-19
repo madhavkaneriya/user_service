@@ -1,1 +1,8 @@
-node_modules/
+# Ignore node_modules and dist folders
+/backend/node_modules/
+/backend/dist/
+
+# Other common ignores
+.env
+.DS_Store
+npm-debug.log
