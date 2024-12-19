@@ -6,18 +6,19 @@ export class User extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, unique: true })
-  email: string;
-
   @Prop({
     required: true,
+    unique: true,
     validate: {
       validator: function (v: string) {
-        return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
       },
-      message: () => `Invalid password format!`
+      message: () => `Invalid emailId!`
     }
   })
+  email: string;
+
+  @Prop({ required: true})
   password: string;
 
   @Prop()
