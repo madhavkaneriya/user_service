@@ -24,7 +24,7 @@ Before you begin, ensure you have the following installed on your machine:
 **Clone the repository:**
 
 ```bash
-git clone https://github.com/your-username/user_service.git
+git clone https://github.com/madhavkaneriya/user_service
 cd user_service
 ```
 
