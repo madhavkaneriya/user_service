@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import './styles/signin.css'; // Add a CSS file for custom styling
+import { useLoggedInUser } from '../context/UserContext';
+import './styles/signin.css';
 
 const BASE_URL = 'http://localhost:3000';
 
 const Signin: React.FC = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const { setToken } = useLoggedInUser();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,6 +20,7 @@ const Signin: React.FC = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${BASE_URL}/users/signin`, formData);
+      setToken(response.data?.data?.accessToken);
       if (response.status === 200) navigate('/welcome');
     } catch (err) {
       if (err?.response?.data?.message) {

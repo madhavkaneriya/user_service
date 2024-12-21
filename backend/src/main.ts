@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 
@@ -6,9 +7,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap'); // Custom context name
 
+  app.use(helmet()); // Enable security headers
+
   app.enableCors({
     origin: process.env.ORIGIN ?? 'http://localhost:8080',
-    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
     credentials: true,
   });
 

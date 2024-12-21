@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, HttpCode, BadRequestException, UnauthorizedException, Logger } from "@nestjs/common";
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, HttpCode, BadRequestException, UnauthorizedException, Logger, UseGuards, Req, Patch } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { SignupDto, SigninDto, UpdateUserDto } from "./users.dto";
 import { User } from "./users.schema";
+import { AuthGuard } from "../auth/auth.guard";
+import { AuthService } from "../auth/auth.service";
 
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
-  constructor(private readonly userService: UsersService ) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly authService: AuthService
+  ) {}
 
   @Post('signup')
   @HttpCode(HttpStatus.OK)
@@ -18,12 +23,16 @@ export class UsersController {
       throw new BadRequestException('User with this email already exists!');
     }
     try {
-      const newUser = await this.userService.create(createUserDto);
+      // hash user password
+      const hashedPwd = await this.authService.hashPassword(createUserDto.password);
+      const newUser = await this.userService.create({ ...createUserDto, password: hashedPwd });
+      // get user token
+      const token = await this.authService.signin(newUser);
       this.logger.log(`User with email ${createUserDto.email} signed up!`);
       return {
         statusCode: HttpStatus.OK,
         message: 'Successfully signed up!',
-        data: newUser
+        data: { ...newUser, accessToken: token }
       };
     } catch (err) {
       this.logger.error(`Error while signing up: ${err?.message}`, err);
@@ -37,18 +46,46 @@ export class UsersController {
   @Post('signin')
   @HttpCode(HttpStatus.OK)
   async signIn(@Body() signInUserDto: SigninDto) {
-    const user = await this.userService.signIn(signInUserDto);
+    const { email, password } = signInUserDto;
+    const user = await this.authService.validateUser(email, password);
     if (!user) {
       this.logger.warn(`Invalid credentials while signin for email ${signInUserDto.email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
-    
-    this.logger.log(`${user._id} signed in!`);
+    const token = await this.authService.signin(user);
+    await this.userService.updateLoginInfo(user._id as string);
+    this.logger.log(`User with id ${user._id} signed in!`);
     return {
       statusCode: HttpStatus.OK,
       message: 'Signin successful!',
-      data: user,
+      data: { ...user, accessToken: token },
     };
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  async getProfile(@Req() req) {
+    const { user } = req;
+    this.logger.log(`User with id ${user.sub} requested profile!`);
+    const userDoc = await this.userService.findOne(user.sub);
+    delete userDoc.password;
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: userDoc,
+    }
+  }
+
+  @Patch('update-profile')
+  @UseGuards(AuthGuard)
+  async updateProfile(@Req() req) {
+    const { user } = req;
+    const userDoc = await this.userService.incrementGamesPlayed(user.sub);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: userDoc,
+    }
   }
 
   // other CRUD APIs

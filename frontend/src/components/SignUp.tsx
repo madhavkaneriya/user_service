@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { useLoggedInUser } from 'src/context/UserContext';
 import './styles/signup.css';
 
 const BASE_URL = 'http://localhost:3000';
 
 const Signup: React.FC = () => {
+  const { setToken } = useLoggedInUser();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,8 +22,8 @@ const Signup: React.FC = () => {
       const response = await axios.post(`${BASE_URL}/users/signup`, formData);
       if (response.status === 200) {
         setError('');
-        setSuccess('Signup successful! Redirecting...');
-        setTimeout(() => navigate('/welcome'), 1000);
+        setToken(response.data?.data?.accessToken);
+        navigate('/welcome');
       }
     } catch (err) {
       if (err?.response?.data?.message) {
@@ -38,7 +39,6 @@ const Signup: React.FC = () => {
       <div className="signup-card">
         <h2 className="signup-title">Create Your Account</h2>
         {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">{success}</p>}
         <form onSubmit={handleSubmit} className="signup-form">
           <input
             type="text"
